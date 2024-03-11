@@ -1,5 +1,5 @@
 import sqlite3
-from helpers import database_path
+from src.helpers import database_path
 
 
 class DatabaseHandler:
