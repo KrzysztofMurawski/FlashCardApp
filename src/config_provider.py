@@ -1,5 +1,5 @@
 import configparser
-from src.helpers import config_file_path
+from helpers import config_file_path
 
 
 class ConfigProvider:
