@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import *
 
 from config_provider import config
 from database import DatabaseHandler
-from deck import Deck
+from objects import Deck
 
 
 class MainWindow(QMainWindow):
@@ -66,6 +66,7 @@ class MainWindow(QMainWindow):
         initial_layout.addWidget(scroll_area)
         central_widget.setLayout(initial_layout)
         self.show()
+
 
     def display_deck_tile(self, deck):
         deck_frame = QFrame(self)

@@ -12,10 +12,13 @@ def main():
     create_appdata_project_folder()
     db_handler = DatabaseHandler()
 
+    print(db_handler.get_all_decks())
+    print(db_handler.get_all_cards())
 
     app = QApplication(sys.argv)
     main_window = MainWindow()
     app.exec()
+
 
 
 
