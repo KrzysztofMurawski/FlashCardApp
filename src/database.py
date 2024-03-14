@@ -39,6 +39,11 @@ class DatabaseHandler:
         self.cursor.execute("SELECT * FROM deck_card")
         return self.cursor.fetchall()
 
+    def delete_card_from_deck(self, card_id, deck_id):
+        self.cursor.execute("DELETE FROM deck_card WHERE deck_id = ? AND card_id = ?", (deck_id, card_id))
+        self.cursor.execute("DELETE FROM card WHERE rowid = ?", (card_id,))
+        self.commit()
+
     def commit(self):
         self.connection.commit()
 
