@@ -82,8 +82,35 @@ class MainWindow(QMainWindow):
         study_deck_button.clicked.connect(partial(deck.study_deck))
         deck_frame_layout.addWidget(study_deck_button)
 
+        edit_deck_button = QPushButton("Edit")
+        edit_deck_button.clicked.connect(partial(self.create_deck_editing_layout, deck))
+        deck_frame_layout.addWidget(edit_deck_button)
+
         deck_frame.setLayout(deck_frame_layout)
         self.frame_layout.addWidget(deck_frame)
+
+    def create_deck_editing_layout(self, deck):
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        edit_layout = QVBoxLayout()
+
+        # top row with buttons and label
+
+        top_row = QHBoxLayout()
+
+        exit_btn = QPushButton("Go back")
+        exit_btn.clicked.connect(partial(self.create_initial_layout))
+        top_row.addWidget(exit_btn)
+
+        top_row.addWidget(QLabel(deck.name))
+
+        new_card_btn = QPushButton("Go back")
+        new_card_btn.clicked.connect(partial(self.new_card, deck))
+        top_row.addWidget(new_card_btn)
+
+        edit_layout.addLayout(top_row)
+        central_widget.setLayout(edit_layout)
+        self.show()
 
     def new_deck(self):
         dialog = DeckNameInputDialog()
@@ -93,6 +120,15 @@ class MainWindow(QMainWindow):
             self.db_handler.insert_new_deck(deck_name)
             index = len(self.db_handler.get_all_decks())
             self.display_deck_tile(Deck(index, deck_name))
+
+    def new_card(self, deck):
+        dialog = NewCardInputDialog()
+        dialog.exec()
+        question = dialog.question
+        answer = dialog.answer
+        if question and answer:
+            self.db_handler.insert_new_card(deck.deck_id, question, answer)
+
 
 
 class DeckNameInputDialog(QDialog):
@@ -118,4 +154,31 @@ class DeckNameInputDialog(QDialog):
         # Retrieve input value
         input_value = self.input_field.text()
         self.deck_name = input_value
+        self.accept()
+
+
+class NewCardInputDialog(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.question = None
+        self.answer = None
+        self.setWindowTitle("Create new card")
+
+        layout = QVBoxLayout()
+
+        self.question_input = QLineEdit()
+        layout.addWidget(self.question_input)
+
+        self.answer_input = QLineEdit()
+        layout.addWidget(self.answer_input)
+
+        ok_button = QPushButton("OK")
+        ok_button.clicked.connect(self.handle_ok_button)
+        layout.addWidget(ok_button)
+
+        self.setLayout(layout)
+
+    def handle_ok_button(self):
+        self.answer = self.answer_input.text()
+        self.question = self.answer_input.text()
         self.accept()

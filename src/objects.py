@@ -11,6 +11,9 @@ class Deck:
     def study_deck(self):
         print(self.name, self.deck_id)
 
+    def edit_deck(self):
+        print("Editing", self.name)
+
 
 class Card:
     def __init__(self, deck_id, question, answer):

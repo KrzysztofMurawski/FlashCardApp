@@ -14,6 +14,8 @@ def main():
 
     print(db_handler.get_all_decks())
     print(db_handler.get_all_cards())
+    print(db_handler.get_all_deck_card_pairs())
+
 
     app = QApplication(sys.argv)
     main_window = MainWindow()

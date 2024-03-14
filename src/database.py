@@ -26,6 +26,10 @@ class DatabaseHandler:
         self.cursor.execute("SELECT rowid, * FROM card")
         return self.cursor.fetchall()
 
+    def get_all_deck_card_pairs(self):
+        self.cursor.execute("SELECT * FROM deck_card")
+        return self.cursor.fetchall()
+
     def commit(self):
         self.connection.commit()
 
@@ -42,9 +46,9 @@ class DatabaseHandler:
                 CREATE TABLE IF NOT EXISTS card (
                     question TEXT,
                     answer TEXT,
-                    repeats INTEGER DEFAULT 0,
-                    last_reviewed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    last_confidence INTEGER DEFAULT 1
+                    revisions INTEGER DEFAULT 0,
+                    last_revision TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_evaluation INTEGER DEFAULT 1
                 )""")
 
             self.cursor.execute("""
