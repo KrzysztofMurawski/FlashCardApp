@@ -9,7 +9,7 @@ class DatabaseHandler:
         self.create_tables_if_dont_exist()
 
     def insert_new_deck(self, deck_name):
-        self.cursor.execute(f"INSERT INTO deck VALUES ( '{deck_name}' )")
+        self.cursor.execute(f"INSERT INTO deck VALUES ( ? )", (deck_name,))
         self.commit()
 
     def insert_new_card(self, deck_id, question, answer):
@@ -24,6 +24,15 @@ class DatabaseHandler:
 
     def get_all_cards(self):
         self.cursor.execute("SELECT rowid, * FROM card")
+        return self.cursor.fetchall()
+
+    def get_cards_from_deck(self, deck_id):
+        self.cursor.execute("SELECT card_id FROM deck_card WHERE deck_id = ?", (deck_id,))
+        card_ids = self.cursor.fetchall()
+        self.cursor.execute(f"""SELECT rowid, *
+                                FROM card
+                                WHERE rowid IN ({", ".join([str(card_id[0]) for card_id in card_ids])})
+                            """)
         return self.cursor.fetchall()
 
     def get_all_deck_card_pairs(self):
