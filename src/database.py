@@ -6,7 +6,14 @@ class DatabaseHandler:
     def __init__(self):
         self.connection = sqlite3.connect(database_path)
         self.cursor = self.connection.cursor()
-        self.create_tables_if_dont_exist()
+
+    def update_card_question_content(self, card_id: int, new_question: str):
+        self.cursor.execute("UPDATE card SET question = ? WHERE rowid = ?", (new_question, card_id))
+        self.commit()
+
+    def update_card_answer_content(self, card_id: int, new_answer: str):
+        self.cursor.execute("UPDATE card SET answer = ? WHERE rowid = ?", (new_answer, card_id))
+        self.commit()
 
     def insert_new_deck(self, deck_name):
         self.cursor.execute(f"INSERT INTO deck VALUES ( ? )", (deck_name,))

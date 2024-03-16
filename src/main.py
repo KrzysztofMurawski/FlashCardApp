@@ -7,21 +7,14 @@ from helpers import create_appdata_project_folder
 from gui.gui import MainWindow
 
 
-
 def main():
     create_appdata_project_folder()
     db_handler = DatabaseHandler()
-
-    print(db_handler.get_all_decks())
-    print(db_handler.get_all_cards())
-    print(db_handler.get_all_deck_card_pairs())
-
+    db_handler.create_tables_if_dont_exist()
 
     app = QApplication(sys.argv)
     main_window = MainWindow()
     app.exec()
-
-
 
 
 if __name__ == "__main__":

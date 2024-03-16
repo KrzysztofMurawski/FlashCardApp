@@ -68,27 +68,6 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(initial_layout)
         self.show()
 
-
-    def display_deck_tile(self, deck):
-        deck_frame = QFrame(self)
-        deck_frame.setFrameShape(QFrame.Shape.Box)
-        deck_frame.setLineWidth(1)
-        deck_frame.setStyleSheet("border-color: grey;")
-        deck_frame.setFixedHeight(50)
-        deck_frame_layout = QHBoxLayout()
-        deck_frame_layout.addWidget(QLabel(deck.name))
-
-        study_deck_button = QPushButton("Study")
-        study_deck_button.clicked.connect(partial(deck.study_deck))
-        deck_frame_layout.addWidget(study_deck_button)
-
-        edit_deck_button = QPushButton("Edit")
-        edit_deck_button.clicked.connect(partial(self.create_deck_editing_layout, deck))
-        deck_frame_layout.addWidget(edit_deck_button)
-
-        deck_frame.setLayout(deck_frame_layout)
-        self.frame_layout.addWidget(deck_frame)
-
     def create_deck_editing_layout(self, deck):
         self.setWindowTitle(f"Edit {deck.name} deck")
         central_widget = QWidget()
@@ -126,7 +105,6 @@ class MainWindow(QMainWindow):
         for card in cards:
             self.display_card_tile(card, deck)
 
-
         # Init layout
 
         frame.setLayout(self.frame_layout)
@@ -136,6 +114,27 @@ class MainWindow(QMainWindow):
         edit_layout.addWidget(scroll_area)
         central_widget.setLayout(edit_layout)
         self.show()
+
+    def display_deck_tile(self, deck):
+        deck_frame = QFrame(self)
+        deck_frame.setFrameShape(QFrame.Shape.Box)
+        deck_frame.setLineWidth(1)
+        deck_frame.setStyleSheet("border-color: grey;")
+        deck_frame.setFixedHeight(50)
+        deck_frame_layout = QHBoxLayout()
+        deck_frame_layout.addWidget(QLabel(deck.name))
+
+        study_deck_button = QPushButton("Study")
+        study_deck_button.clicked.connect(partial(deck.study_deck))
+        deck_frame_layout.addWidget(study_deck_button)
+
+        edit_deck_button = QPushButton("Edit")
+        edit_deck_button.clicked.connect(partial(self.create_deck_editing_layout, deck))
+        deck_frame_layout.addWidget(edit_deck_button)
+
+        deck_frame.setLayout(deck_frame_layout)
+        self.frame_layout.addWidget(deck_frame)
+
 
     def display_card_tile(self, card: Card, deck: Deck):
         card_frame = QFrame(self)
@@ -149,10 +148,12 @@ class MainWindow(QMainWindow):
 
         question_edit = QTextEdit()
         question_edit.setText(card.question)
+        question_edit.textChanged.connect(partial(self.question_editing_finished, card, question_edit))
         card_frame_layout.addWidget(question_edit)
 
         answer_edit = QTextEdit()
         answer_edit.setText(card.answer)
+        answer_edit.textChanged.connect(partial(self.answer_editing_finished, card, answer_edit))
         card_frame_layout.addWidget(answer_edit)
 
         delete_btn = QPushButton("Delete")
@@ -183,6 +184,12 @@ class MainWindow(QMainWindow):
     def delete_card(self, card: Card, deck: Deck):
         self.db_handler.delete_card_from_deck(card.card_id, deck.deck_id)
         self.create_deck_editing_layout(deck)
+
+    def question_editing_finished(self, card: Card, new_question: QTextEdit):
+        self.db_handler.update_card_question_content(card.card_id, new_question.toPlainText())
+
+    def answer_editing_finished(self, card: Card, new_answer: QTextEdit):
+        self.db_handler.update_card_answer_content(card.card_id, new_answer.toPlainText())
 
 
 class DeckNameInputDialog(QDialog):
