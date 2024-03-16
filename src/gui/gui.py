@@ -115,7 +115,80 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(edit_layout)
         self.show()
 
-    def display_deck_tile(self, deck):
+    def create_deck_studying_layout(self, deck: Deck):
+        self.setWindowTitle(f"FlashCardApp: {deck.name}")
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+
+        studying_layout = QVBoxLayout()
+
+        # question section
+        question_label = QLabel("Question:")
+        question_label.setFixedHeight(30)
+
+        question_scroll_area = QScrollArea()
+        question_scroll_area.setWidgetResizable(True)
+
+        question_content_frame = QFrame(self)
+        question_content_frame.setFrameShape(QFrame.Shape.Box)
+        question_content_frame.setLineWidth(1)
+        question_content_frame.setStyleSheet("border-color: black;")
+
+        question_content_layout = QVBoxLayout()
+        question_content_label = QLabel("There will be question \n\n\n maybe multiline")
+        question_content_layout.addWidget(question_content_label)
+        question_content_frame.setLayout(question_content_layout)
+
+        question_scroll_area.setWidget(question_content_frame)
+
+        # answer section
+
+        answer_label = QLabel("Answer:")
+        answer_label.setFixedHeight(30)
+
+        answer_scroll_area = QScrollArea()
+        answer_scroll_area.setWidgetResizable(True)
+
+        answer_content_frame = QFrame(self)
+        answer_content_frame.setFrameShape(QFrame.Shape.Box)
+        answer_content_frame.setLineWidth(1)
+        answer_content_frame.setStyleSheet("border-color: black;")
+
+        answer_content_layout = QVBoxLayout()
+        answer_content_label = QLabel()
+        answer_content_layout.addWidget(answer_content_label)
+        answer_content_frame.setLayout(answer_content_layout)
+
+        answer_scroll_area.setWidget(answer_content_frame)
+
+        # Bottom buttons bar
+
+        buttons_bar = QHBoxLayout()
+
+        exit_studying_button = QPushButton("Exit")
+        exit_studying_button.clicked.connect(partial(self.create_initial_layout))
+
+        show_answer_button = QPushButton("Show answer")
+
+        difficulty_rating_label = QLabel("Difficulty rating: ")
+
+
+        buttons_bar.addWidget(exit_studying_button)
+        buttons_bar.addWidget(show_answer_button)
+        buttons_bar.addWidget(difficulty_rating_label)
+
+
+        # Init layout
+
+        studying_layout.addWidget(question_label)
+        studying_layout.addWidget(question_scroll_area)
+        studying_layout.addWidget(answer_label)
+        studying_layout.addWidget(answer_scroll_area)
+        studying_layout.addLayout(buttons_bar)
+        central_widget.setLayout(studying_layout)
+        self.show()
+
+    def display_deck_tile(self, deck: Deck):
         deck_frame = QFrame(self)
         deck_frame.setFrameShape(QFrame.Shape.Box)
         deck_frame.setLineWidth(1)
@@ -125,7 +198,7 @@ class MainWindow(QMainWindow):
         deck_frame_layout.addWidget(QLabel(deck.name))
 
         study_deck_button = QPushButton("Study")
-        study_deck_button.clicked.connect(partial(deck.study_deck))
+        study_deck_button.clicked.connect(partial(self.create_deck_studying_layout, deck))
         deck_frame_layout.addWidget(study_deck_button)
 
         edit_deck_button = QPushButton("Edit")

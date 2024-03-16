@@ -1,18 +1,9 @@
-from database import DatabaseHandler
 
 
 class Deck:
     def __init__(self, deck_id, name):
         self.name = name
         self.deck_id = deck_id
-
-        self.db_handler = DatabaseHandler()
-
-    def study_deck(self):
-        print(self.name, self.deck_id)
-
-    def edit_deck(self):
-        print("Editing", self.name)
 
 
 class Card:
