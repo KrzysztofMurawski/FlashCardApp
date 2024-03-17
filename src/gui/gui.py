@@ -1,3 +1,4 @@
+import random
 from functools import partial
 
 from PyQt6.QtCore import Qt
@@ -6,6 +7,7 @@ from PyQt6.QtWidgets import *
 from config_provider import config
 from database import DatabaseHandler
 from objects import Deck, Card
+from gui.dialogs import DeckNameInputDialog, NewCardInputDialog
 
 
 class MainWindow(QMainWindow):
@@ -115,8 +117,12 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(edit_layout)
         self.show()
 
-    def create_deck_studying_layout(self, deck: Deck):
+    def create_card_studying_layout(self, deck: Deck):
+        cards = self.db_handler.get_cards_from_deck(deck.deck_id)
+        chosen_card = Card(*random.choice(cards))
+
         self.setWindowTitle(f"FlashCardApp: {deck.name}")
+
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
@@ -135,7 +141,7 @@ class MainWindow(QMainWindow):
         question_content_frame.setStyleSheet("border-color: black;")
 
         question_content_layout = QVBoxLayout()
-        question_content_label = QLabel("There will be question \n\n\n maybe multiline")
+        question_content_label = QLabel(chosen_card.question)
         question_content_layout.addWidget(question_content_label)
         question_content_frame.setLayout(question_content_layout)
 
@@ -169,14 +175,25 @@ class MainWindow(QMainWindow):
         exit_studying_button.clicked.connect(partial(self.create_initial_layout))
 
         show_answer_button = QPushButton("Show answer")
+        show_answer_button.clicked.connect(partial(answer_content_label.setText, chosen_card.answer))
 
         difficulty_rating_label = QLabel("Difficulty rating: ")
 
+        difficulty_rating_buttons_layout = QHBoxLayout()
+        difficulty_rating_buttons = [QPushButton("1"),
+                                    QPushButton("2"),
+                                    QPushButton("3"),
+                                    QPushButton("4"),
+                                    QPushButton("5")]
+
+        for button in difficulty_rating_buttons:
+            button.clicked.connect(partial(self.update_card_and_display_next, chosen_card, button.text(), deck))
+            difficulty_rating_buttons_layout.addWidget(button)
 
         buttons_bar.addWidget(exit_studying_button)
         buttons_bar.addWidget(show_answer_button)
         buttons_bar.addWidget(difficulty_rating_label)
-
+        buttons_bar.addLayout(difficulty_rating_buttons_layout)
 
         # Init layout
 
@@ -198,7 +215,7 @@ class MainWindow(QMainWindow):
         deck_frame_layout.addWidget(QLabel(deck.name))
 
         study_deck_button = QPushButton("Study")
-        study_deck_button.clicked.connect(partial(self.create_deck_studying_layout, deck))
+        study_deck_button.clicked.connect(partial(self.create_card_studying_layout, deck))
         deck_frame_layout.addWidget(study_deck_button)
 
         edit_deck_button = QPushButton("Edit")
@@ -207,7 +224,6 @@ class MainWindow(QMainWindow):
 
         deck_frame.setLayout(deck_frame_layout)
         self.frame_layout.addWidget(deck_frame)
-
 
     def display_card_tile(self, card: Card, deck: Deck):
         card_frame = QFrame(self)
@@ -235,6 +251,9 @@ class MainWindow(QMainWindow):
 
         card_frame.setLayout(card_frame_layout)
         self.frame_layout.addWidget(card_frame)
+
+    def update_card_and_display_next(self, card: Card, new_difficulty_rating: int, deck: Deck):
+        print(card.card_id, new_difficulty_rating, deck.deck_id)
 
     def new_deck(self):
         dialog = DeckNameInputDialog()
@@ -265,53 +284,3 @@ class MainWindow(QMainWindow):
         self.db_handler.update_card_answer_content(card.card_id, new_answer.toPlainText())
 
 
-class DeckNameInputDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.deck_name = None
-        self.setWindowTitle("Name your deck")
-
-        layout = QVBoxLayout()
-
-        # Create input field
-        self.input_field = QLineEdit()
-        layout.addWidget(self.input_field)
-
-        # Create OK button
-        ok_button = QPushButton("OK")
-        ok_button.clicked.connect(self.handle_ok_button)
-        layout.addWidget(ok_button)
-
-        self.setLayout(layout)
-
-    def handle_ok_button(self):
-        input_value = self.input_field.text()
-        self.deck_name = input_value
-        self.accept()
-
-
-class NewCardInputDialog(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.question = None
-        self.answer = None
-        self.setWindowTitle("Create new card")
-
-        layout = QVBoxLayout()
-
-        self.question_input = QLineEdit()
-        layout.addWidget(self.question_input)
-
-        self.answer_input = QLineEdit()
-        layout.addWidget(self.answer_input)
-
-        ok_button = QPushButton("OK")
-        ok_button.clicked.connect(self.handle_ok_button)
-        layout.addWidget(ok_button)
-
-        self.setLayout(layout)
-
-    def handle_ok_button(self):
-        self.answer = self.answer_input.text()
-        self.question = self.question_input.text()
-        self.accept()
