@@ -26,7 +26,7 @@ class DatabaseHandler:
         self.commit()
 
     def insert_new_card(self, deck_id, question, answer):
-        self.cursor.execute("INSERT INTO card VALUES (?, ?, 0, ?, 1)", (question, answer, None))
+        self.cursor.execute("INSERT INTO card VALUES (?, ?, 0, CURRENT_TIMESTAMP, 1)", (question, answer))
         card_id = self.cursor.lastrowid
         self.cursor.execute("INSERT INTO deck_card VALUES (?, ?)", (deck_id, card_id))
         self.commit()

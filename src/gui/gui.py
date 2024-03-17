@@ -5,6 +5,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import *
 
 from config_provider import config
+from helpers import choose_card
 from database import DatabaseHandler
 from objects import Deck, Card
 from gui.dialogs import DeckNameInputDialog, NewCardInputDialog
@@ -116,7 +117,7 @@ class MainWindow(QMainWindow):
 
     def create_card_studying_layout(self, deck: Deck):
         cards = self.db_handler.get_cards_from_deck(deck.deck_id)
-        chosen_card = Card(*random.choice(cards))
+        chosen_card = Card(*choose_card(cards))
 
         self.setWindowTitle(f"FlashCardApp: {deck.name}")
 
