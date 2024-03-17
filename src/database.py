@@ -15,9 +15,10 @@ class DatabaseHandler:
         self.cursor.execute("UPDATE card SET answer = ? WHERE rowid = ?", (new_answer, card_id))
         self.commit()
 
-    def update_card_last_evaluation_and_timestamp(self, card_id: int, new_eval: int):
+    def update_card_revision_data(self, card_id: int, new_eval: int):
         self.cursor.execute("UPDATE card SET last_evaluation = ? WHERE rowid = ?", (new_eval, card_id))
         self.cursor.execute("UPDATE card SET last_revision = CURRENT_TIMESTAMP WHERE rowid = ?", (card_id,))
+        self.cursor.execute("UPDATE card SET revisions = revisions + 1 WHERE rowid = ?", (card_id,))
         self.commit()
 
     def insert_new_deck(self, deck_name):

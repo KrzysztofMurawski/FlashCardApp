@@ -35,9 +35,6 @@ class MainWindow(QMainWindow):
         new_deck_button.clicked.connect(self.new_deck)
         tool_bar_buttons_layout.addWidget(new_deck_button)
 
-        import_deck_button = QPushButton("Import deck")
-        tool_bar_buttons_layout.addWidget(import_deck_button)
-
         # Label
 
         decks_label = QLabel("Your decks: ")
@@ -119,7 +116,6 @@ class MainWindow(QMainWindow):
 
     def create_card_studying_layout(self, deck: Deck):
         cards = self.db_handler.get_cards_from_deck(deck.deck_id)
-        print(cards)
         chosen_card = Card(*random.choice(cards))
 
         self.setWindowTitle(f"FlashCardApp: {deck.name}")
@@ -254,7 +250,7 @@ class MainWindow(QMainWindow):
         self.frame_layout.addWidget(card_frame)
 
     def update_card_and_display_next(self, card: Card, new_difficulty_rating: int, deck: Deck):
-        self.db_handler.update_card_last_evaluation_and_timestamp(card.card_id, new_difficulty_rating)
+        self.db_handler.update_card_revision_data(card.card_id, new_difficulty_rating)
         self.create_card_studying_layout(deck)
 
     def new_deck(self):
